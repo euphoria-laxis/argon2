@@ -31,7 +31,7 @@ This package also contains a **RandomString(int)(string,error)** function.
 
 ## Contributions
 
-**Euphoria Laxis**
+**Euphoria Laxis** [GitHub](https://github.com/euphoria-laxis)
 
 ## License
 
