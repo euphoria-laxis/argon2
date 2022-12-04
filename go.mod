@@ -1,4 +1,4 @@
-module argon2_utils
+module github.com/euphoria-laxis/argon2
 
 go 1.19
 

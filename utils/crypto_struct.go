@@ -1,4 +1,4 @@
-package argon2_utils
+package utils
 
 import "errors"
 
