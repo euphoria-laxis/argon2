@@ -15,7 +15,7 @@ Utils to encrypt passwords using argon2
         if err != nil {
             ...
         }
-        match, err := argon2_utils.CompareStringToArgon2Hash(randomString, hashedString)
+        match, err := argon2_utils.CompareStringToArgon2Hash(password, hashedString)
         if err != nil {
             ...
         }
