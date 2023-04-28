@@ -1,7 +1,6 @@
-package _tests
+package utils
 
 import (
-	"github.com/euphoria-laxis/argon2/utils"
 	"log"
 	"testing"
 )
@@ -12,12 +11,12 @@ var (
 
 func TestHashStringArgon2(t *testing.T) {
 	var err error
-	randomString, err = utils.RandomString(32)
+	randomString, err = RandomString(32)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
 	}
-	hashedString, err = utils.HashStringArgon2(randomString)
+	hashedString, err = HashStringArgon2(randomString)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
@@ -25,7 +24,7 @@ func TestHashStringArgon2(t *testing.T) {
 }
 
 func TestCompareStringToArgon2Hash(t *testing.T) {
-	match, err := utils.CompareStringToArgon2Hash(randomString, hashedString)
+	match, err := CompareStringToArgon2Hash(randomString, hashedString)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
@@ -35,12 +34,12 @@ func TestCompareStringToArgon2Hash(t *testing.T) {
 		log.Println("passwords should match")
 		t.Fail()
 	}
-	randomString, err = utils.RandomString(32)
+	randomString, err = RandomString(32)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
 	}
-	match, err = utils.CompareStringToArgon2Hash(randomString, hashedString)
+	match, err = CompareStringToArgon2Hash(randomString, hashedString)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
