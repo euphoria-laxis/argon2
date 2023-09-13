@@ -1,4 +1,4 @@
-package utils
+package argon2
 
 import (
 	"log"
