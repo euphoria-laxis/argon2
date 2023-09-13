@@ -34,7 +34,7 @@ func (decoder *Decoder) decodeHash(encodedHash string) (d *Decoder, salt, hash [
 	if version != argon2.Version {
 		return nil, nil, nil, ErrIncompatibleVersion
 	}
-	_, err = fmt.Sscanf(values[3], "m=%d,t=%d,p=%d", &decoder.memory, &decoder.iterations, &decoder.parallelism)
+	_, err = fmt.Sscanf(values[3], "m=%d,t=%d,p=%d", &decoder.Memory, &decoder.Iterations, &decoder.Parallelism)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -43,12 +43,12 @@ func (decoder *Decoder) decodeHash(encodedHash string) (d *Decoder, salt, hash [
 		return nil, nil, nil, err
 	}
 	d = decoder
-	d.saltLength = uint32(len(salt))
+	d.SaltLength = uint32(len(salt))
 	hash, err = base64.RawStdEncoding.DecodeString(values[5])
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	d.keyLength = uint32(len(hash))
+	d.KeyLength = uint32(len(hash))
 
 	return d, salt, hash, nil
 }
@@ -58,7 +58,7 @@ func (decoder *Decoder) CompareStringToHash(password string, hashedPassword stri
 	if err != nil {
 		return false, err
 	}
-	otherHash := argon2.IDKey([]byte(password), salt, p.iterations, p.memory, p.parallelism, p.keyLength)
+	otherHash := argon2.IDKey([]byte(password), salt, p.Iterations, p.Memory, p.Parallelism, p.KeyLength)
 	if subtle.ConstantTimeCompare(hash, otherHash) == 1 {
 		return true, nil
 	}
