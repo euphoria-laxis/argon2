@@ -4,30 +4,46 @@
 
 Utils to encrypt passwords using argon2
 
-## Usage
+## Usages
 
-### Example
+### Hash password
 
 ````go
-    func func main() {
-        password := 'qwerty@123'
-        hashedString, err := argon2_utils.HashStringArgon2(password)
-        if err != nil {
-            ...
-        }
-        match, err := argon2_utils.CompareStringToArgon2Hash(password, hashedString)
-        if err != nil {
-            ...
-        }
-        if !match {
-            log.Println("passwords don't match")
-        } else {
-            log.Println("passwords match")
-        }
+    password := 'qwerty@123'
+    // Create new encoder using default options
+    encoder, _ := argon2.NewEncoder()
+    hashedString, err = encoder.HashString(randomString)
+    if err != nil {
+        // handle error
     }
 ````
 
-This package also contains a **RandomString(int)(string,error)** function.
+### Compare password with hashed string
+
+````go
+    // Create new decoder using default options
+    decoder, _ := argon2.NewDecoder()
+    match, err := decoder.CompareStringToHash(password, hashedString)
+    if err != nil {
+		// handle error
+    }
+````
+
+### Configure encoder or decoder options
+
+Note that encoder and decoder inherited from the same base struct *(argon2.Options)*.
+You can use the same `argon2.OptFunc` slice to configure both encoder and decoder.
+
+````go
+    // Create new encoder using custom parameters
+    encoder, options := argon2.NewEncoder(
+        SetMemory(64 * 1024), // 64 bits
+        SetParallelism(4),    // 4 concurrent actions
+        SetKeyLength(32),     // key length
+        SetSaltLength(32),    // salt length
+        SetIterations(4),     // number of iterations
+    )
+````
 
 ## Contributions
 
