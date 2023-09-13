@@ -7,24 +7,37 @@ import (
 
 var (
 	randomString, hashedString string
+	opts                       []OptFunc
 )
 
-func TestHashStringArgon2(t *testing.T) {
+func TestOptions(t *testing.T) {
+	opts = []OptFunc{
+		SetMemory(32 * 1024), // 32 bits
+		SetParallelism(4),    // 4 concurrent actions
+		SetKeyLength(32),     // key length
+		SetSaltLength(32),    // salt length
+		SetIterations(4),     // 4 iterations, should be fast since there's 4 concurrent actions
+	}
+}
+
+func TestEncoder(t *testing.T) {
 	var err error
-	randomString, err = RandomString(32)
+	encoder, _ := NewEncoder(opts...)
+	randomString, err = encoder.RandomString(32)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
 	}
-	hashedString, err = HashStringArgon2(randomString)
+	hashedString, err = encoder.HashString(randomString)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
 	}
 }
 
-func TestCompareStringToArgon2Hash(t *testing.T) {
-	match, err := CompareStringToArgon2Hash(randomString, hashedString)
+func TestDecoder(t *testing.T) {
+	decoder, _ := NewDecoder(opts...)
+	match, err := decoder.CompareStringToHash(randomString, hashedString)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
@@ -34,12 +47,13 @@ func TestCompareStringToArgon2Hash(t *testing.T) {
 		log.Println("passwords should match")
 		t.Fail()
 	}
-	randomString, err = RandomString(32)
+	encoder, _ := NewEncoder(opts...)
+	randomString, err = encoder.RandomString(32)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
 	}
-	match, err = CompareStringToArgon2Hash(randomString, hashedString)
+	match, err = decoder.CompareStringToHash(randomString, hashedString)
 	if err != nil {
 		log.Print(err)
 		t.Fail()
