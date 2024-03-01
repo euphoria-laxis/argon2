@@ -8,20 +8,13 @@ import (
 	"strings"
 )
 
-type Decoder struct {
-	Options
+type Decoder struct{}
+
+func NewDecoder() *Decoder {
+	return new(Decoder)
 }
 
-func NewDecoder(opts ...OptFunc) (*Decoder, *Options) {
-	o := defaultOptions
-	for _, fn := range opts {
-		fn(&o)
-	}
-
-	return &Decoder{o}, &o
-}
-
-func (decoder *Decoder) decodeHash(encodedHash string) (d *Decoder, salt, hash []byte, err error) {
+func (decoder *Decoder) decodeHash(encodedHash string) (o *Options, salt, hash []byte, err error) {
 	values := strings.Split(encodedHash, "$")
 	if len(values) != 6 {
 		return nil, nil, nil, ErrInvalidHash
@@ -34,7 +27,8 @@ func (decoder *Decoder) decodeHash(encodedHash string) (d *Decoder, salt, hash [
 	if version != argon2.Version {
 		return nil, nil, nil, ErrIncompatibleVersion
 	}
-	_, err = fmt.Sscanf(values[3], "m=%d,t=%d,p=%d", &decoder.Memory, &decoder.Iterations, &decoder.Parallelism)
+	o = new(Options)
+	_, err = fmt.Sscanf(values[3], "m=%d,t=%d,p=%d", &o.Memory, &o.Iterations, &o.Parallelism)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -42,15 +36,15 @@ func (decoder *Decoder) decodeHash(encodedHash string) (d *Decoder, salt, hash [
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	d = decoder
-	d.SaltLength = uint32(len(salt))
+	o.SaltLength = uint32(len(salt))
+
 	hash, err = base64.RawStdEncoding.DecodeString(values[5])
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	d.KeyLength = uint32(len(hash))
+	o.KeyLength = uint32(len(hash))
 
-	return d, salt, hash, nil
+	return o, salt, hash, nil
 }
 
 func (decoder *Decoder) CompareStringToHash(password string, hashedPassword string) (match bool, err error) {

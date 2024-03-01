@@ -36,7 +36,7 @@ func TestEncoder(t *testing.T) {
 }
 
 func TestDecoder(t *testing.T) {
-	decoder, _ := NewDecoder(opts...)
+	decoder := NewDecoder()
 	match, err := decoder.CompareStringToHash(randomString, hashedString)
 	if err != nil {
 		log.Print(err)
