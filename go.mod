@@ -1,4 +1,4 @@
-module euphoria-laxis.fr/go-packages/argon2
+module euphoria-laxis.fr/go-packages/argon2/v0
 
 go 1.19
 
