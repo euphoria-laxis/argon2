@@ -1,4 +1,4 @@
-module euphoria-laxis.fr/go-packages/argon2
+module github.com/euphoria-laxis/argon2
 
 go 1.22
 
