@@ -1,7 +1,7 @@
-module euphoria-laxis.fr/go-packages/argon2/v0
+module github.com/euphoria-laxis/argon2
 
-go 1.19
+go 1.24.4
 
-require golang.org/x/crypto v0.3.0
+require golang.org/x/crypto v0.46.0
 
-require golang.org/x/sys v0.2.0 // indirect
+require golang.org/x/sys v0.39.0 // indirect

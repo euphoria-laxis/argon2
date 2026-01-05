@@ -1,4 +1,4 @@
-package argon2
+package hashing
 
 import "errors"
 
@@ -12,7 +12,7 @@ type Options struct {
 
 var (
 	ErrInvalidHash         = errors.New("the encoded hash is not in the correct format")
-	ErrIncompatibleVersion = errors.New("incompatible version of argon2")
+	ErrIncompatibleVersion = errors.New("incompatible version of hashing")
 	defaultOptions         = Options{
 		Memory:      64 * 1024,
 		Iterations:  3,
