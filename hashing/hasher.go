@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
+// Hasher represents the hashing options and methods.
 type Hasher struct {
 	Options
 }
@@ -35,8 +36,8 @@ func (hasher *Hasher) setPrefix() string {
 	)
 }
 
-// generateRandomBytes.
-func (hasher *Hasher) generateRandomBytes(n uint32) ([]byte, error) {
+// RandomBytes returns n length random byte slice.
+func (hasher *Hasher) RandomBytes(n uint32) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -46,8 +47,25 @@ func (hasher *Hasher) generateRandomBytes(n uint32) ([]byte, error) {
 	return b, nil
 }
 
-func (hasher *Hasher) HashString(password string) (encodedHash string, err error) {
-	salt, err := hasher.generateRandomBytes(hasher.SaltLength)
+// RandomString returns rand string with given size.
+func (hasher *Hasher) RandomString(s uint32) (string, error) {
+	b, err := hasher.RandomBytes(s)
+	if err != nil {
+		return "", err
+	}
+	// Decode bytes into a b64 encoded string.
+	b64 := base64.RawURLEncoding.EncodeToString(b)
+	// Remove base 64 encoding characters.
+	b64 = strings.ReplaceAll(b64, "=", "")
+	b64 = strings.ReplaceAll(b64, "-", "")
+	b64 = strings.ReplaceAll(b64, "_", "")
+
+	return b64[0:s], err
+}
+
+// HashString return argon2 hash.
+func (hasher *Hasher) HashString(password string) (string, error) {
+	salt, err := hasher.RandomBytes(hasher.SaltLength)
 	if err != nil {
 		return "", err
 	}
@@ -66,39 +84,32 @@ func (hasher *Hasher) HashString(password string) (encodedHash string, err error
 	return fmt.Sprintf("%s$%s$%s", hasher.setPrefix(), b64Salt, b64Hash), nil
 }
 
-// RandomString.
-func (hasher *Hasher) RandomString(s int) (string, error) {
-	b, err := hasher.generateRandomBytes(uint32(s))
-
-	return base64.URLEncoding.EncodeToString(b), err
-}
-
 // getHashOptions returns Options from hashed string.
-func (hasher *Hasher) getHashOptions(encodedHash string) (o *Options, salt, hash []byte, err error) {
+func (hasher *Hasher) getHashOptions(encodedHash string) (*Options, []byte, []byte, error) {
 	values := strings.Split(encodedHash, "$")
 	if len(values) != 6 {
 		return nil, nil, nil, ErrInvalidHash
 	}
 	var version int
-	_, err = fmt.Sscanf(values[2], "v=%d", &version)
+	_, err := fmt.Sscanf(values[2], "v=%d", &version)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	if version != argon2.Version {
 		return nil, nil, nil, ErrIncompatibleVersion
 	}
-	o = new(Options)
+	o := new(Options)
 	_, err = fmt.Sscanf(values[3], "m=%d,t=%d,p=%d", &o.Memory, &o.Iterations, &o.Parallelism)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	salt, err = base64.RawStdEncoding.DecodeString(values[4])
+	salt, err := base64.RawStdEncoding.DecodeString(values[4])
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	o.SaltLength = uint32(len(salt))
 
-	hash, err = base64.RawStdEncoding.DecodeString(values[5])
+	hash, err := base64.RawStdEncoding.DecodeString(values[5])
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -108,7 +119,7 @@ func (hasher *Hasher) getHashOptions(encodedHash string) (o *Options, salt, hash
 }
 
 // CompareStringToHash compares if string and hash matches.
-func (hasher *Hasher) CompareStringToHash(password string, hashedPassword string) (match bool, err error) {
+func (hasher *Hasher) CompareStringToHash(password string, hashedPassword string) (bool, error) {
 	p, salt, hash, err := hasher.getHashOptions(hashedPassword)
 	if err != nil {
 		return false, err
