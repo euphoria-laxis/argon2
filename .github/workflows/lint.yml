@@ -1,13 +1,14 @@
-name: linter
+name: lint
+
 on:
     push:
         tags:
             - v*
     pull_request:
         branches:
-            - dev
             - master
             - release/*
+            - dev/*
 
 jobs:
     lint:
