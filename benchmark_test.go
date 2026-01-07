@@ -46,9 +46,9 @@ var (
 	}
 )
 
-// _testBenchmark run the benchmark tests. Cognitive complexity is voluntarily high to stress test the package.
+// _testMatchingHashAndString test true, nil returns on CompareStringToHash function.
 // nolint:gocognit
-func _testBenchmark(_ *testing.B, input int, hasher *hashing.Hasher) func(b *testing.B) {
+func _testMatchingHashAndString(_ *testing.B, input int, hasher *hashing.Hasher) func(b *testing.B) {
 	return func(b *testing.B) {
 		b.Logf("benchmark %d", input)
 		for range b.N {
@@ -71,12 +71,33 @@ func _testBenchmark(_ *testing.B, input int, hasher *hashing.Hasher) func(b *tes
 			if !match {
 				b.Fatalf("passwords comparison failed, password should match")
 			}
+		}
+	}
+}
+
+// _testNotMatchingHashAndString test false, nil returns on CompareStringToHash function.
+// nolint:gocognit
+func _testNotMatchingHashAndString(_ *testing.B, input int, hasher *hashing.Hasher) func(b *testing.B) {
+	return func(b *testing.B) {
+		b.Logf("benchmark %d", input)
+		for range b.N {
+			// Generate a random
+			randomString, err := hasher.RandomString(uint32(rand.Int32N(32-12) + 12))
+			if err != nil {
+				b.Fatalf("hashing_test failed to generate random string: %v", err)
+			}
+			// Hash random string.
+			hashedString, err := hasher.HashString(randomString)
+			if err != nil {
+				b.Fatalf("hashing_test failed to hash string: %v", err)
+			}
 			// Now we test when the origin and hash don't match
 			// Generate a random string.
 			randomString, err = hasher.RandomString(uint32(rand.Int32N(32-12) + 12))
 			if err != nil {
 				b.Fatalf("hashing_test failed to generate random string: %v", err)
 			}
+			var match bool
 			match, err = hasher.CompareStringToHash(randomString, hashedString)
 			if err != nil {
 				b.Fatalf("hashing_test failed to compare hash: %v", err)
@@ -93,7 +114,12 @@ func BenchmarkHasherOptions1(b *testing.B) {
 	testSetOptions1()
 	hasher := hashing.NewHasher(opts...)
 	for _, v := range benchmarkInputs {
-		b.Run(fmt.Sprintf("interations_%d", v.input), _testBenchmark(b, v.input, hasher))
+		b.Run(
+			fmt.Sprintf("_testMatchingHashAndString_options1_%d", v.input),
+			_testMatchingHashAndString(b, v.input, hasher))
+		b.Run(
+			fmt.Sprintf("_testNotMatchingHashAndString_options1_%d", v.input),
+			_testNotMatchingHashAndString(b, v.input, hasher))
 	}
 }
 
@@ -102,6 +128,11 @@ func BenchmarkHasherOptions2(b *testing.B) {
 	testSetOptions2()
 	hasher := hashing.NewHasher(opts...)
 	for _, v := range benchmarkInputs {
-		b.Run(fmt.Sprintf("interations_%d", v.input), _testBenchmark(b, v.input, hasher))
+		b.Run(
+			fmt.Sprintf("_testMatchingHashAndString_options2_%d", v.input),
+			_testMatchingHashAndString(b, v.input, hasher))
+		b.Run(
+			fmt.Sprintf("_testNotMatchingHashAndString_options2_%d", v.input),
+			_testNotMatchingHashAndString(b, v.input, hasher))
 	}
 }

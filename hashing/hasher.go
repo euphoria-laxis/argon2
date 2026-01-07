@@ -84,8 +84,8 @@ func (hasher *Hasher) HashString(password string) (string, error) {
 	return fmt.Sprintf("%s$%s$%s", hasher.setPrefix(), b64Salt, b64Hash), nil
 }
 
-// getHashOptions returns Options from hashed string.
-func (hasher *Hasher) getHashOptions(encodedHash string) (*Options, []byte, []byte, error) {
+// ExtractOptions returns Options from hashed string.
+func (hasher *Hasher) ExtractOptions(encodedHash string) (*Options, []byte, []byte, error) {
 	values := strings.Split(encodedHash, "$")
 	if len(values) != 6 {
 		return nil, nil, nil, ErrInvalidHash
@@ -120,7 +120,7 @@ func (hasher *Hasher) getHashOptions(encodedHash string) (*Options, []byte, []by
 
 // CompareStringToHash compares if string and hash matches.
 func (hasher *Hasher) CompareStringToHash(password string, hashedPassword string) (bool, error) {
-	p, salt, hash, err := hasher.getHashOptions(hashedPassword)
+	p, salt, hash, err := hasher.ExtractOptions(hashedPassword)
 	if err != nil {
 		return false, err
 	}
