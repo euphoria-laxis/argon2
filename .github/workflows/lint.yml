@@ -26,12 +26,6 @@ jobs:
                       .golangci.yml
                       README.md
                       LICENSE
-            - name: Download and install dependencies
-              id: install-deps
-              run: |
-                  go mod download
-                  go mod tidy
-                  go mod vendor
             - name: Run golangci-lint
               id: golangci-lint
               run: |

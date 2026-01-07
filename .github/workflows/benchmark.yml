@@ -34,4 +34,4 @@ jobs:
             - name: Run go benchmark
               id: go-benchmark
               run: |
-                  go test github.com/euphoria-laxis/argon2 -bench=. -benchtime=10s
+                  go test github.com/euphoria-laxis/argon2 -bench=. -benchtime=5x
