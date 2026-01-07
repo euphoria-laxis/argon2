@@ -2,48 +2,53 @@
 
 ## About
 
-Utils to encrypt passwords using argon2
+Utils simplify passwords hashing using argon2
 
 ## Usages
 
-### Hash password
+### Basic usage example
 
 ````go
-    password := 'qwerty@123'
-    // Create new encoder using default options
-    encoder, _ := argon2.NewEncoder()
-    hashedString, err = encoder.HashString(randomString)
+package main
+
+import "github.com/euphoria-laxis/argon2/hashing"
+
+func main() 
+    password := "qwerty@123
+    // Create new encoder using default 
+    hasher := hashing.NewHasher()
+    hashedString, err := hasher.HashString(password)
     if err != nil {
         // handle error
+        panic(err)
     }
-````
-
-### Compare password with hashed string
-
-````go
-    // Create new decoder using default options
-    decoder, _ := argon2.NewDecoder()
-    match, err := decoder.CompareStringToHash(password, hashedString)
+    match, err := hasher.CompareStringToHash(password, hashedString)
     if err != nil {
-		// handle error
+        // handle error
+        panic(err)
     }
+    if !match {
+        // password doesn't march
+        panic("password and hash do not match")
+    }
+    print("success")
+}
 ````
 
-### Configure encoder or decoder options
-
-Note that encoder and decoder inherited from the same base struct *(argon2.Options)*.
-You can use the same `argon2.OptFunc` slice to configure both encoder and decoder.
+### Configure hasher options
 
 ````go
-    // Create new encoder using custom parameters
-    encoder, options := argon2.NewEncoder(
-        SetMemory(64 * 1024), // 64 bits
-        SetParallelism(4),    // 4 concurrent actions
-        SetKeyLength(32),     // key length
-        SetSaltLength(32),    // salt length
-        SetIterations(4),     // number of iterations
-    )
+// Create new encoder using custom parameters
+hasher := hashing.NewHasher(
+    hashing.SetMemory(64 * 1024),
+    hashing.SetParallelism(4),
+    hashing.SetKeyLength(32),
+    hashing.SetSaltLength(32),
+    hashing.SetIterations(4),
+)
 ````
+
+You can use the [example](./_examples/example.go) to see the package usage.
 
 ## Contributions
 
